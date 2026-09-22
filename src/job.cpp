@@ -308,6 +308,9 @@ void RestJob::ApplyCommonOptions()
 	curl_easy_setopt(m_easy, CURLOPT_MAX_SEND_SPEED_LARGE, static_cast<curl_off_t>(config.maxSendSpeed));
 	curl_easy_setopt(m_easy, CURLOPT_MAX_RECV_SPEED_LARGE, static_cast<curl_off_t>(config.maxRecvSpeed));
 	curl_easy_setopt(m_easy, CURLOPT_ACCEPT_ENCODING, "");
+	const long chunkSize =
+		std::max(1024L, std::min(static_cast<long>(CURL_MAX_READ_SIZE), static_cast<long>(config.chunkSize)));
+	curl_easy_setopt(m_easy, CURLOPT_BUFFERSIZE, chunkSize);
 	curl_easy_setopt(m_easy, CURLOPT_HEADERFUNCTION, HeaderCallback);
 	curl_easy_setopt(m_easy, CURLOPT_HEADERDATA, this);
 	curl_easy_setopt(m_easy, CURLOPT_WRITEFUNCTION, WriteCallback);

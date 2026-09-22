@@ -50,6 +50,7 @@ struct ClientConfig
 	long maxSendSpeed = 0;
 	long maxRecvSpeed = 0;
 	long long maxBodySize = 4LL * 1024 * 1024;
+	int chunkSize = 16384;
 	bool followRedirects = true;
 	bool verifyCertificate = true;
 };

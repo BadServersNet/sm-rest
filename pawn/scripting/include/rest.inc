@@ -170,6 +170,13 @@ methodmap RESTRequest < Handle
 		public native set(int value);
 	}
 
+	// Receive buffer size in bytes (1024 to 10 MiB), which bounds the size of each OnData chunk.
+	property int ChunkSize
+	{
+		public native get();
+		public native set(int value);
+	}
+
 	property bool FollowRedirects
 	{
 		public native get();
@@ -253,6 +260,13 @@ methodmap RESTClient < Handle
 		public native set(int value);
 	}
 
+	// Receive buffer size in bytes (1024 to 10 MiB), which bounds the size of each OnData chunk.
+	property int ChunkSize
+	{
+		public native get();
+		public native set(int value);
+	}
+
 	property bool FollowRedirects
 	{
 		public native get();
@@ -315,6 +329,8 @@ public void __ext_rest_SetNTVOptional()
 	MarkNativeAsOptional("RESTClient.MaxRecvSpeed.set");
 	MarkNativeAsOptional("RESTClient.MaxBodySize.get");
 	MarkNativeAsOptional("RESTClient.MaxBodySize.set");
+	MarkNativeAsOptional("RESTClient.ChunkSize.get");
+	MarkNativeAsOptional("RESTClient.ChunkSize.set");
 	MarkNativeAsOptional("RESTClient.FollowRedirects.get");
 	MarkNativeAsOptional("RESTClient.FollowRedirects.set");
 	MarkNativeAsOptional("RESTClient.VerifyCertificate.get");
@@ -343,6 +359,8 @@ public void __ext_rest_SetNTVOptional()
 	MarkNativeAsOptional("RESTRequest.MaxRecvSpeed.set");
 	MarkNativeAsOptional("RESTRequest.MaxBodySize.get");
 	MarkNativeAsOptional("RESTRequest.MaxBodySize.set");
+	MarkNativeAsOptional("RESTRequest.ChunkSize.get");
+	MarkNativeAsOptional("RESTRequest.ChunkSize.set");
 	MarkNativeAsOptional("RESTRequest.FollowRedirects.get");
 	MarkNativeAsOptional("RESTRequest.FollowRedirects.set");
 	MarkNativeAsOptional("RESTRequest.VerifyCertificate.get");
