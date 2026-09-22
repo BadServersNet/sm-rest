@@ -55,6 +55,7 @@ private:
 	size_t WriteMemory(const char *data, size_t total);
 	size_t WriteFile(const char *data, size_t total);
 	size_t WriteStream(const char *data, size_t total);
+	void FlushStream();
 	void OnHeaderLine(const std::string &line);
 	void OnHeadersComplete();
 	void PostProgress(curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
@@ -92,6 +93,7 @@ private:
 	rest::HeaderList m_responseHeaders;
 	std::string m_partPath;
 	std::string m_responseBody;
+	std::string m_streamBuffer;
 	std::string m_effectiveUrl;
 	RequestSpec m_spec;
 	int m_attempt = 0;

@@ -124,6 +124,7 @@ bool RestJob::IsRetryDue(std::chrono::steady_clock::time_point now) const
 void RestJob::ResetAttemptState()
 {
 	m_responseBody.clear();
+	m_streamBuffer.clear();
 	m_responseHeaders.clear();
 	m_headersPosted = false;
 	m_bodyLength = 0;
@@ -635,16 +636,32 @@ size_t RestJob::WriteStream(const char *data, size_t total)
 		return CURL_WRITEFUNC_PAUSE;
 	}
 
-	m_pendingStreamBytes += static_cast<long long>(total);
+	m_streamBuffer.append(data, total);
 	m_bodyLength += static_cast<long long>(total);
+
+	if (m_streamBuffer.size() >= static_cast<size_t>(m_spec.config.chunkSize))
+	{
+		FlushStream();
+	}
+
+	return total;
+}
+
+void RestJob::FlushStream()
+{
+	if (m_streamBuffer.empty())
+	{
+		return;
+	}
+
+	m_pendingStreamBytes += static_cast<long long>(m_streamBuffer.size());
 
 	TransferEvent event;
 	event.kind = TransferEvent::Kind::Data;
 	event.jobId = m_spec.id;
-	event.body.assign(data, total);
+	event.body = std::move(m_streamBuffer);
+	m_streamBuffer.clear();
 	m_queue->Post(std::move(event));
-
-	return total;
 }
 
 void RestJob::OnStreamConsumed(long long bytes)
@@ -714,7 +731,7 @@ void RestJob::PostProgress(curl_off_t dltotal, curl_off_t dlnow, curl_off_t ulto
 	const bool downloadComplete = dltotal > 0 && dlnow >= dltotal;
 	const bool uploadComplete = ultotal > 0 && ulnow >= ultotal;
 
-	if (!downloadComplete && !uploadComplete && elapsed < 100)
+	if (!downloadComplete && !uploadComplete && elapsed < m_spec.config.progressInterval)
 	{
 		return;
 	}
@@ -877,6 +894,7 @@ void RestJob::HandleHttpSuccess()
 {
 	if (m_spec.outputPath.empty())
 	{
+		FlushStream();
 		Finish(RestStatus::Ok, "");
 
 		return;
